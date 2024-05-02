@@ -1,9 +1,11 @@
 package org.scrape;
+import lombok.Getter;
 import lombok.NonNull;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
@@ -12,10 +14,12 @@ public class FugitiveScraper {
 
     private static FugitiveScraper fugitiveScraper;
     private final WebDriver scrapeDriver;
-    private static final String URL = "https://www.terorarananlar.pol.tr";
-    private LinkedList<Fugitive> fugitives;
-    private final Logger logger = Logger.getLogger(FugitiveScraper.class.getName());
+    private final String baseURL = "https://www.terorarananlar.pol.tr";
 
+    @Getter
+    private static LinkedList<Fugitive> fugitives;
+    private final Logger logger = Logger.getLogger(FugitiveScraper.class.getName());
+    private final ImageDownloader imageDownloader = ImageDownloader.getInstance();
 
 
     /**
@@ -45,13 +49,14 @@ public class FugitiveScraper {
      * @param listColor the color of the list
      */
     public void scrape(@NonNull FugitiveColorEnum listColor){
-        scrapeDriver.get(URL);
+        scrapeDriver.get(baseURL);
         WebElement element = scrapeDriver.findElement(By.cssSelector("div.wanted-group:nth-child("+listColor.getColor()+")"));
         element.click();
         scrapeDriver.navigate().refresh();
         Sleep.sleep(2000);
         acceptCookie();
         WebElement childElementByClassName;
+        WebElement childElementImageByClassName;
         for(int i = 1; i < 431; i++){
             try {
                 if (scrapeDriver.findElements(By.cssSelector("div.deactivated-list-card:nth-child(" + i + ")")).isEmpty())
@@ -64,20 +69,25 @@ public class FugitiveScraper {
                     logger.warning("The"+i+"th element is empty.");
                     continue;
                 }
+
+                childElementImageByClassName = scrapeDriver.findElement(By.cssSelector("div.deactivated-list-card:nth-child("+i+")> div:nth-child(1)"));
                 String[] childElementText = childElementByClassName.getText().split("\n");
                 String[] name = childElementText[0].split(" ");
                 String[] birthPlaceAndDate = childElementText[1].split("-");
-                Fugitive fugitive = new Fugitive(name[0], name[1], birthPlaceAndDate[0], birthPlaceAndDate[1], childElementText[2], listColor.getColorName());
+
+                Fugitive fugitive = new Fugitive(name[0], name[1], birthPlaceAndDate[0], birthPlaceAndDate[1],
+                        childElementText[2], listColor.getColorName(),getImage(childElementImageByClassName));
                 fugitives.add(fugitive);
-                System.out.println(fugitive);
                 pushButtonForLoadingPeople();
                 sleepPeriodically();
+
 
             } catch (NoSuchElementException noSuchElementException){
                 logger.warning("The"+i+"th element is not found in the card list.");
             }
         }
         System.out.println("Fugitive list size: "+fugitives.size());
+        System.out.println(fugitives.stream().findFirst());
 
     }
 
@@ -116,5 +126,18 @@ public class FugitiveScraper {
      */
     public void close(){
         scrapeDriver.close();
+    }
+
+    /**
+     * Gets the image URL from the given WebElement.
+     * @param element the WebElement
+     * @return the image URL
+     */
+    public String getImage(@NonNull WebElement element){
+        return imageDownloader.downloadImage(
+                baseURL + element.getAttribute("style").substring(
+                        element.getAttribute("style").indexOf('"')+1,
+                        element.getAttribute("style").lastIndexOf('"'))
+        );
     }
 }
