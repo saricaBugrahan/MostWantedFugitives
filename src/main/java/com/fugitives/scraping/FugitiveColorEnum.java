@@ -1,4 +1,4 @@
-package org.scrape;
+package com.fugitives.scraping;
 
 import lombok.Getter;
 

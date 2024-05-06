@@ -1,6 +1,5 @@
-package org.scrape;
+package com.fugitives.scraping;
 
-import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;

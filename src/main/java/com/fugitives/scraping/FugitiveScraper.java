@@ -1,12 +1,12 @@
-package org.scrape;
+package com.fugitives.scraping;
 import lombok.Getter;
 import lombok.NonNull;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -55,50 +55,50 @@ public class FugitiveScraper {
         scrapeDriver.navigate().refresh();
         Sleep.sleep(2000);
         acceptCookie();
-        WebElement childElementByClassName;
+        pushButtonForLoadingPeople();
+        List<WebElement> listCards = scrapeDriver.findElements(By.cssSelector("div.deactivated-list-card"));
         WebElement childElementImageByClassName;
-        for(int i = 1; i < 431; i++){
-            try {
-                if (scrapeDriver.findElements(By.cssSelector("div.deactivated-list-card:nth-child(" + i + ")")).isEmpty())
-                    continue;
-                childElementByClassName = scrapeDriver.findElement(By.cssSelector("div.deactivated-list-card:nth-child(" + i + ")"));
-                if (!childElementByClassName.isDisplayed())
-                    continue;
-
-                if (childElementByClassName.getText().isEmpty()){
-                    logger.warning("The"+i+"th element is empty.");
-                    continue;
-                }
-
-                childElementImageByClassName = scrapeDriver.findElement(By.cssSelector("div.deactivated-list-card:nth-child("+i+")> div:nth-child(1)"));
-                String[] childElementText = childElementByClassName.getText().split("\n");
-                String[] name = childElementText[0].split(" ");
-                String[] birthPlaceAndDate = childElementText[1].split("-");
-
-                Fugitive fugitive = new Fugitive(name[0], name[1], birthPlaceAndDate[0], birthPlaceAndDate[1],
-                        childElementText[2], listColor.getColorName(),getImage(childElementImageByClassName));
-                fugitives.add(fugitive);
-                pushButtonForLoadingPeople();
-                sleepPeriodically();
-
-
-            } catch (NoSuchElementException noSuchElementException){
-                logger.warning("The"+i+"th element is not found in the card list.");
+        for(WebElement childElementByClassName: listCards){
+            if(!childElementByClassName.isDisplayed()){
+                logger.warning("Web Element is not displayed");
+                continue;
             }
-        }
-        System.out.println("Fugitive list size: "+fugitives.size());
-        System.out.println(fugitives.stream().findFirst());
+            if(childElementByClassName.getText().isEmpty()){
+                logger.warning("Web Element text is empty");
+                continue;
+            }
+            try {
+                childElementImageByClassName = childElementByClassName.findElement(By.id("terroristPhoto"));
+            } catch (NoSuchElementException noSuchElementException){
+                logger.warning("Web Element does not have image file"+noSuchElementException.getMessage());
+                continue;
+            }
+            String[] childElementText = childElementByClassName.getText().split("\n");
+            String[] name = childElementText[0].split(" ");
+            String[] birthPlaceAndDate = childElementText[1].split("-");
 
+            Fugitive fugitive = new Fugitive(name[0], name[1], birthPlaceAndDate[0], birthPlaceAndDate[1],
+                    childElementText[2], listColor.getColorName(),getImage(childElementImageByClassName));
+
+            fugitives.add(fugitive);
+            sleepPeriodically();
+
+        }
+        logger.info("Size: "+fugitives.size());
     }
 
     /**
      * Pushes the button for loading more people if it is available.
      */
     public void pushButtonForLoadingPeople(){
-        if (!scrapeDriver.findElements(By.cssSelector("#dahaFazlaYukleBtn")).isEmpty()){
+        while (!scrapeDriver.findElements(By.cssSelector("#dahaFazlaYukleBtn")).isEmpty()){
             WebElement getMorePeopleButton = scrapeDriver.findElement(By.cssSelector("#dahaFazlaYukleBtn"));
-            if (getMorePeopleButton.isDisplayed())
+            if (getMorePeopleButton.isDisplayed()){
                 getMorePeopleButton.click();
+            } else
+                break;
+
+            Sleep.sleep(200);
         }
     }
 

@@ -1,4 +1,4 @@
-package org.scrape;
+package com.fugitives.scraping;
 
 
 import lombok.AllArgsConstructor;
@@ -20,5 +20,6 @@ public class Fugitive {
     private String color;
     @Nullable
     private String b64Image;
+
 
 }

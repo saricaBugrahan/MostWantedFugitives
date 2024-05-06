@@ -1,16 +1,11 @@
-package org.scrape;
+package com.fugitives.scraping;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.LinkedList;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+
+    public static void main(String[] args) {
         FugitiveScraper fugitiveScraper = FugitiveScraper.getInstance();
-        fugitiveScraper.scrape(FugitiveColorEnum.BLUE);
+        fugitiveScraper.scrape(FugitiveColorEnum.RED);
         fugitiveScraper.scrape(FugitiveColorEnum.GREEN);
         fugitiveScraper.scrape(FugitiveColorEnum.ORANGE);
         fugitiveScraper.scrape(FugitiveColorEnum.BLUE);
