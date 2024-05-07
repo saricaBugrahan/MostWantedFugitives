@@ -1,4 +1,4 @@
-package com.fugitives.scraping;
+package com.fugitives.common;
 
 import java.util.logging.Logger;
 

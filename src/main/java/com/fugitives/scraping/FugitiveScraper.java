@@ -1,4 +1,6 @@
 package com.fugitives.scraping;
+import com.fugitives.common.ImageDownloader;
+import com.fugitives.common.Sleep;
 import lombok.Getter;
 import lombok.NonNull;
 import org.openqa.selenium.*;
@@ -30,6 +32,15 @@ public class FugitiveScraper {
     private FugitiveScraper(){
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--headless");
+        chromeOptions.addArguments("--disable-gpu");
+        chromeOptions.addArguments("--no-sandbox");
+        chromeOptions.addArguments("--disable-dev-shm-usage");
+        chromeOptions.addArguments("--single-process");
+        chromeOptions.addArguments("--disable-extensions");
+        chromeOptions.addArguments("--disable-popup-blocking");
+        chromeOptions.addArguments("--mute-audio");
+
+
         scrapeDriver = new ChromeDriver(chromeOptions);
         fugitives = new LinkedList<>();
     }
@@ -53,7 +64,7 @@ public class FugitiveScraper {
         WebElement element = scrapeDriver.findElement(By.cssSelector("div.wanted-group:nth-child("+listColor.getColor()+")"));
         element.click();
         scrapeDriver.navigate().refresh();
-        Sleep.sleep(2000);
+        Sleep.sleep(300);
         acceptCookie();
         pushButtonForLoadingPeople();
         List<WebElement> listCards = scrapeDriver.findElements(By.cssSelector("div.deactivated-list-card"));
@@ -78,9 +89,10 @@ public class FugitiveScraper {
             String[] birthPlaceAndDate = childElementText[1].split("-");
 
             Fugitive fugitive = new Fugitive(name[0], name[1], birthPlaceAndDate[0], birthPlaceAndDate[1],
-                    childElementText[2], listColor.getColorName(),getImage(childElementImageByClassName));
-
+                    childElementText[2], listColor.getColorName(),null);
+            //getImage(childElementImageByClassName)
             fugitives.add(fugitive);
+            System.out.println(fugitive);
             sleepPeriodically();
 
         }
