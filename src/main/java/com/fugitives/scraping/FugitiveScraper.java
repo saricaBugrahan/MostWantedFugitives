@@ -1,6 +1,7 @@
 package com.fugitives.scraping;
 import com.fugitives.common.ImageDownloader;
 import com.fugitives.common.Sleep;
+import com.fugitives.db.RedisClient;
 import lombok.Getter;
 import lombok.NonNull;
 import org.openqa.selenium.*;
@@ -19,8 +20,6 @@ public class FugitiveScraper {
     private final WebDriver scrapeDriver;
     private final String baseURL = "https://www.terorarananlar.pol.tr";
 
-    @Getter
-    private static LinkedList<Fugitive> fugitives;
     private final Logger logger = Logger.getLogger(FugitiveScraper.class.getName());
     private final ImageDownloader imageDownloader = ImageDownloader.getInstance();
 
@@ -44,10 +43,7 @@ public class FugitiveScraper {
         chromeOptions.addArguments("--ignore-certificate-errors");
         chromeOptions.addArguments("acceptInsecureCerts=true");
 
-
-
         scrapeDriver = new ChromeDriver(chromeOptions);
-        fugitives = new LinkedList<>();
     }
 
     /**
@@ -67,12 +63,10 @@ public class FugitiveScraper {
     public void scrape(@NonNull FugitiveColorEnum listColor){
         scrapeDriver.get(baseURL);
         WebElement element = scrapeDriver.findElement(By.cssSelector("div.wanted-group:nth-child("+listColor.getColor()+")"));
-        element.click();
-        Sleep.sleep(300);
         acceptCookie();
-
+        element.click();
+        Sleep.sleep(1000);
         pushButtonForLoadingPeople();
-
         List<WebElement> listCards = scrapeDriver.findElements(By.cssSelector("div.deactivated-list-card"));
         WebElement childElementImageByClassName;
         for(WebElement childElementByClassName: listCards){
@@ -96,12 +90,12 @@ public class FugitiveScraper {
 
             Fugitive fugitive = new Fugitive(name[0], name[1], birthPlaceAndDate[0], birthPlaceAndDate[1],
                     childElementText[2], listColor.getColorName(),null);
-            //getImage(childElementImageByClassName)
-            fugitives.add(fugitive);
+
+            RedisClient.getInstance().saveObject(fugitive.getName()+fugitive.getBirthDate(),fugitive);
+            fugitive.setB64Image(getImage(childElementImageByClassName));
             System.out.println(fugitive);
 
         }
-        logger.info("Size: "+fugitives.size());
     }
 
     /**
@@ -112,11 +106,10 @@ public class FugitiveScraper {
             WebElement getMorePeopleButton = scrapeDriver.findElement(By.cssSelector("#dahaFazlaYukleBtn"));
             if (getMorePeopleButton.isDisplayed()){
                 getMorePeopleButton.click();
-                Sleep.sleep(400);
             } else
                 break;
 
-
+            Sleep.sleep(800);
         }
     }
 
@@ -144,10 +137,15 @@ public class FugitiveScraper {
      * @return the image URL
      */
     public String getImage(@NonNull WebElement element){
-        return imageDownloader.downloadImage(
-                baseURL + element.getAttribute("style").substring(
-                        element.getAttribute("style").indexOf('"')+1,
-                        element.getAttribute("style").lastIndexOf('"'))
-        );
+        try {
+            return imageDownloader.downloadImage(
+                    baseURL + element.getAttribute("style").substring(
+                            element.getAttribute("style").indexOf('"')+1,
+                            element.getAttribute("style").lastIndexOf('"'))
+            );
+        } catch (IndexOutOfBoundsException indexOutOfBoundsException){
+            logger.warning("URL does not fit into the format!: " + indexOutOfBoundsException.getMessage());
+            return null;
+        }
     }
 }
