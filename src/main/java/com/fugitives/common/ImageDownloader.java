@@ -12,7 +12,6 @@ public class ImageDownloader {
     private static ImageDownloader imageDownloader;
     private final Logger logger = Logger.getLogger(ImageDownloader.class.getName());
     private ImageDownloader(){
-
     }
 
     /**
@@ -44,5 +43,4 @@ public class ImageDownloader {
             return null;
         }
     }
-
 }

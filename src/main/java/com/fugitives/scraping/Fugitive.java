@@ -21,7 +21,7 @@ public class Fugitive {
     @Nullable
     private String b64Image;
 
-    public int createKeyForID(){
+    public int getHashID(){
         return name.hashCode()+birthDate.hashCode();
     }
 
