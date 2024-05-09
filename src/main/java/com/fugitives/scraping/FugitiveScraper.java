@@ -7,6 +7,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -30,15 +31,19 @@ public class FugitiveScraper {
      * and initializes the fugitives list.
      */
     private FugitiveScraper(){
+        System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver-linux64/chromedriver");
         ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("--headless");
-        chromeOptions.addArguments("--disable-gpu");
-        chromeOptions.addArguments("--no-sandbox");
-        chromeOptions.addArguments("--disable-dev-shm-usage");
-        chromeOptions.addArguments("--single-process");
-        chromeOptions.addArguments("--disable-extensions");
-        chromeOptions.addArguments("--disable-popup-blocking");
-        chromeOptions.addArguments("--mute-audio");
+        chromeOptions.addArguments("start-maximized"); // open Browser in maximized mode
+        chromeOptions.addArguments("disable-infobars"); // disabling infobars
+        chromeOptions.addArguments("--disable-extensions"); // disabling extensions
+        chromeOptions.addArguments("--disable-gpu"); // applicable to windows os only
+        chromeOptions.addArguments("--disable-dev-shm-usage"); // overcome limited resource problems
+        chromeOptions.addArguments("--no-sandbox"); // Bypass OS security model
+        chromeOptions.addArguments("--headless"); // run in headless mode
+        chromeOptions.addArguments("--allow-insecure-localhost");
+        chromeOptions.addArguments("--ignore-certificate-errors");
+        chromeOptions.addArguments("acceptInsecureCerts=true");
+
 
 
         scrapeDriver = new ChromeDriver(chromeOptions);
@@ -63,10 +68,11 @@ public class FugitiveScraper {
         scrapeDriver.get(baseURL);
         WebElement element = scrapeDriver.findElement(By.cssSelector("div.wanted-group:nth-child("+listColor.getColor()+")"));
         element.click();
-        scrapeDriver.navigate().refresh();
         Sleep.sleep(300);
         acceptCookie();
+
         pushButtonForLoadingPeople();
+
         List<WebElement> listCards = scrapeDriver.findElements(By.cssSelector("div.deactivated-list-card"));
         WebElement childElementImageByClassName;
         for(WebElement childElementByClassName: listCards){
@@ -93,7 +99,6 @@ public class FugitiveScraper {
             //getImage(childElementImageByClassName)
             fugitives.add(fugitive);
             System.out.println(fugitive);
-            sleepPeriodically();
 
         }
         logger.info("Size: "+fugitives.size());
@@ -107,10 +112,11 @@ public class FugitiveScraper {
             WebElement getMorePeopleButton = scrapeDriver.findElement(By.cssSelector("#dahaFazlaYukleBtn"));
             if (getMorePeopleButton.isDisplayed()){
                 getMorePeopleButton.click();
+                Sleep.sleep(400);
             } else
                 break;
 
-            Sleep.sleep(200);
+
         }
     }
 
@@ -123,14 +129,6 @@ public class FugitiveScraper {
             if (acceptButton.isDisplayed())
                 acceptButton.click();
         }
-    }
-
-    /**
-     * Sleeps the thread for 20 milliseconds if the size of the fugitives list is a multiple of 10.
-     */
-    public void sleepPeriodically(){
-        if (fugitives.size() % 10 == 0)
-            Sleep.sleep(20);
     }
 
     /**
