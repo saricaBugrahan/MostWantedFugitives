@@ -152,6 +152,7 @@ public class FugitiveScraper {
      */
     private void navigateIntoScrapingPage(FugitiveColorEnum listColor){
         scrapeDriver.get(baseURL);
+        Sleep.sleep(1000);
         WebElement element = scrapeDriver.findElement(By.cssSelector("div.wanted-group:nth-child("+listColor.getColor()+")"));
         acceptCookie();
         element.click();
