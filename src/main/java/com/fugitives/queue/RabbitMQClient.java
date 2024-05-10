@@ -25,7 +25,6 @@ public class RabbitMQClient {
             Channel channel = connection.createChannel()){
             channel.queueDeclare(QUEUE_NAME, false, false, false, null);
             channel.basicPublish("", QUEUE_NAME, null, object.toString().getBytes());
-            log.info(" [x] Sent '" + object + "'");
 
         } catch (TimeoutException timeoutException){
             logger.warning("RabbitMQ Connection Timeout"+timeoutException.getMessage());
