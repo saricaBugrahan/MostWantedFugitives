@@ -1,6 +1,7 @@
 package com.fugitives.scraping;
 import com.fugitives.common.ImageDownloader;
 import com.fugitives.common.Sleep;
+import com.fugitives.controller.FugitiveController;
 import com.fugitives.db.RedisClient;
 
 import com.fugitives.queue.RabbitMQClient;
@@ -21,7 +22,7 @@ public class FugitiveScraper {
     private final Logger logger = Logger.getLogger(FugitiveScraper.class.getName());
     private final ImageDownloader imageDownloader;
     private final RabbitMQClient rabbitMQClient;
-
+    private final FugitiveController fugitiveController;
     /**
      * Constructor for FugitiveScraper
      * It initializes the ChromeDriver with headless mode
@@ -43,9 +44,9 @@ public class FugitiveScraper {
         scrapeDriver = new ChromeDriver(chromeOptions);
         imageDownloader = ImageDownloader.getInstance();
         rabbitMQClient = new RabbitMQClient();
+        fugitiveController = new FugitiveController("http://localhost:8080/api/v1/fugitives/add");
 
     }
-
     /**
      * Singleton pattern for FugitiveScraper
      * @return fugitiveScraper
@@ -75,6 +76,7 @@ public class FugitiveScraper {
             saveFugitive(fugitive);
             fugitive.setB64Image(getFugitiveB64Image(childElementByClassName));
             sendFugitiveToQueue(fugitive);
+            //fugitiveController.sendPostRequest(fugitive);
         }
     }
 

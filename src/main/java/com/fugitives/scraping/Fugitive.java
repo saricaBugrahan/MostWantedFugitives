@@ -24,5 +24,16 @@ public class Fugitive {
     public int getHashID(){
         return name.hashCode()+birthDate.hashCode();
     }
+    public String toJson(){
+        return "{" +
+                "\"name\":\"" + name + "\"," +
+                "\"surname\":\"" + surname + "\"," +
+                "\"birthPlace\":\"" + birthPlace + "\"," +
+                "\"birthDate\":\"" + birthDate + "\"," +
+                "\"organization\":\"" + organization + "\"," +
+                "\"color\":\"" + color + "\"," +
+                "\"b64Image\":\"" + b64Image + "\"" +
+                "}";
+    }
 
 }

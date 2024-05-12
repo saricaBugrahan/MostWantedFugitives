@@ -5,6 +5,9 @@ services:
     build: .
     ports:
       - "5000:5000"
+    restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   redis:
     image: "redis:alpine"
     hostname: "redis"
