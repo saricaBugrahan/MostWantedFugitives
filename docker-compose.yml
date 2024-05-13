@@ -5,7 +5,7 @@ services:
     build: .
     ports:
       - "5000:5000"
-    restart: always
+    restart: on-failure
     extra_hosts:
       - "host.docker.internal:host-gateway"
   redis:
@@ -13,13 +13,5 @@ services:
     hostname: "redis"
     ports:
       - "6379:6379"
-    depends_on:
-      - scraper
-  rabbitmq:
-    image: "rabbitmq:3-management"
-    hostname: "rabbitmq"
-    ports:
-      - "5672:5672"
-      - "15672:15672"
     depends_on:
       - scraper

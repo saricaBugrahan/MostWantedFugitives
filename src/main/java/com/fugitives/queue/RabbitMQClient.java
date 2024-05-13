@@ -4,7 +4,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import org.slf4j.LoggerFactory;
-
+import com.fugitives.scraping.Fugitive;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
@@ -20,11 +20,11 @@ public class RabbitMQClient {
         factory.setHost("rabbitmq");
     }
 
-    public void sendMessage(Object object){
+    public void sendMessage(Fugitive fugitive){
         try (Connection connection = factory.newConnection();
             Channel channel = connection.createChannel()){
             channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-            channel.basicPublish("", QUEUE_NAME, null, object.toString().getBytes());
+            channel.basicPublish("", QUEUE_NAME, null, fugitive.toJson().getBytes());
 
         } catch (TimeoutException timeoutException){
             logger.warning("RabbitMQ Connection Timeout"+timeoutException.getMessage());

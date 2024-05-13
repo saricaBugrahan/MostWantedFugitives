@@ -24,6 +24,7 @@ public class FugitiveController {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json"); // Set Content-Type header
             OutputStream os = connection.getOutputStream();
             OutputStreamWriter osw = new OutputStreamWriter(os, StandardCharsets.UTF_8);
             osw.write(fugitive.toJson());
@@ -35,7 +36,7 @@ public class FugitiveController {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 logger.info("Fugitive is sent to the API");
             } else {
-                logger.warning("Fugitive is not sent to the API");
+                logger.warning("Fugitive is not sent to the API "+ responseCode);
             }
         } catch (IOException e) {
             logger.warning("Error while sending the request to the API: " + e.getMessage());
