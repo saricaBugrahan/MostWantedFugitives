@@ -17,7 +17,7 @@ public class RabbitMQClient {
     private final Logger logger = Logger.getLogger(RabbitMQClient.class.getName());
     public RabbitMQClient(){
         factory = new ConnectionFactory();
-        factory.setHost("165.232.125.237");
+        factory.setHost("64.226.75.81");
         factory.setPort(5672);
     }
 

@@ -6,10 +6,10 @@
 # Description
 <p>
 This project aims to extract the fugitives information via selenium from 
-<a href="https://www.terorarananlar.pol.tr/">Arananlar</a>.The project contains two different image
-which are scraper and redis. The scraper image is responsible for extracting the information from the website and sending via RabbitMQ.
-The redis image is responsible for storing the extracted information. The rabbitMQ image is responsible for sending the
-extracted information to the server. The server is responsible for storing the extracted information to the database.
+<a href="https://www.terorarananlar.pol.tr/">Arananlar</a>.The project contains two different images
+which are scraper and redis. The scraper image is responsible for extracting the information from the website and sending via RabbitMQ to the server.
+The redis image is responsible for storing the extracted information so that duplicate information will not be sent via RabbitMQ. 
+The server is responsible for storing the extracted information to the database and create an API to access the information.
 
 # Table of Contents
 
