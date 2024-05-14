@@ -18,6 +18,10 @@ public class FugitiveController {
         this.apiPath = apiPath;
     }
 
+    /**
+     *  Send a POST request to the API
+     *  @param fugitive Fugitive object to send to the API
+     * */
     public void sendPostRequest(Fugitive fugitive){
         try {
             URL url = new URL(apiPath);

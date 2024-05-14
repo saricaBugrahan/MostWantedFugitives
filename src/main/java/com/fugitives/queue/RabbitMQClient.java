@@ -17,15 +17,14 @@ public class RabbitMQClient {
     private final Logger logger = Logger.getLogger(RabbitMQClient.class.getName());
     public RabbitMQClient(){
         factory = new ConnectionFactory();
-        factory.setHost("rabbitmq");
+        factory.setHost("165.232.125.237");
+        factory.setPort(5672);
     }
 
     public void sendMessage(Fugitive fugitive){
         try (Connection connection = factory.newConnection();
             Channel channel = connection.createChannel()){
-            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
             channel.basicPublish("", QUEUE_NAME, null, fugitive.toJson().getBytes());
-
         } catch (TimeoutException timeoutException){
             logger.warning("RabbitMQ Connection Timeout"+timeoutException.getMessage());
         } catch (IOException ioException){
