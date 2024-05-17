@@ -1,15 +1,17 @@
-package com.fugitives.scraping;
-
+package com.fugitives.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import javax.annotation.Nullable;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Fugitive {
+
     @NonNull
     private String name;
     private String surname;
@@ -23,17 +25,6 @@ public class Fugitive {
 
     public int getHashID(){
         return name.hashCode()+birthDate.hashCode();
-    }
-    public String toJson(){
-        return "{" +
-                "\"name\":\"" + name + "\"," +
-                "\"surname\":\"" + surname + "\"," +
-                "\"birthPlace\":\"" + birthPlace + "\"," +
-                "\"birthDate\":\"" + birthDate + "\"," +
-                "\"organization\":\"" + organization + "\"," +
-                "\"color\":\"" + color + "\"," +
-                "\"b64Image\":\"" + b64Image + "\"" +
-                "}";
     }
 
 }
